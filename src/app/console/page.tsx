@@ -731,68 +731,130 @@ export default function ConsolePage() {
                 </div>
               </div>
 
-              {/* Connected Hospital Applications Section */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                    {currentUser?.isAdmin
-                      ? 'ระบบงานและแอปพลิเคชันทั้งหมดในโรงพยาบาล [11018]'
-                      : 'แอปพลิเคชันของฉันที่เชื่อมต่อ SSO'}
-                  </h3>
+              {/* Connected Hospital Applications Section - Enhanced & Beautiful Grid */}
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-zinc-200/70 dark:border-zinc-800">
+                  <div>
+                    <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+                      <Share2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <span>
+                        {currentUser?.isAdmin
+                          ? `ระบบงานและแอปพลิเคชันทั้งหมดในโรงพยาบาล [11018] (${clients.length})`
+                          : `แอปพลิเคชันของฉันที่เชื่อมต่อ SSO (${clients.length})`}
+                      </span>
+                    </h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                      {currentUser?.isAdmin
+                        ? 'รวมศูนย์ระบบสารสนเทศ เวชระเบียน และบริการดิจิทัลทั้งหมดของโรงพยาบาลหนองหานที่รองรับการยืนยันตัวตน SSO'
+                        : 'ระบบงานที่ท่านลงทะเบียนไว้เพื่อใช้งานร่วมกับ Single Sign-On'}
+                    </p>
+                  </div>
                   <button
                     onClick={() => setActiveTab('oauth-idp')}
-                    className="text-xs text-emerald-600 dark:text-emerald-400 font-medium hover:underline flex items-center gap-1"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800 transition-colors shrink-0 shadow-2xs"
                   >
-                    <span>{currentUser?.isAdmin ? 'จัดการแอปทั้งหมด' : 'จัดการ / ลงทะเบียนแอปของฉัน'}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>{currentUser?.isAdmin ? 'จัดการแอปทั้งหมด' : 'ลงทะเบียนแอปใหม่'}</span>
                   </button>
                 </div>
 
                 {clients.length === 0 ? (
-                  <div className="p-8 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-center space-y-3">
-                    <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto">
-                      <Share2 className="w-5 h-5" />
+                  <div className="p-12 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-center space-y-4 shadow-sm">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto border border-emerald-100 dark:border-emerald-900">
+                      <Share2 className="w-7 h-7" />
                     </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {currentUser?.isAdmin
-                        ? 'ยังไม่มีแอปพลิเคชันที่ลงทะเบียนในระบบ'
-                        : 'ท่านยังไม่มีแอปพลิเคชันของตนเองที่ลงทะเบียนไว้'}
-                    </p>
+                    <div>
+                      <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                        {currentUser?.isAdmin
+                          ? 'ยังไม่มีแอปพลิเคชันที่ลงทะเบียนในระบบ'
+                          : 'ท่านยังไม่มีแอปพลิเคชันของตนเองที่ลงทะเบียนไว้'}
+                      </h4>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto mt-1">
+                        เริ่มต้นเชื่อมต่อระบบงานภายในโรงพยาบาล เพื่อให้บุคลากรสามารถล็อกอินผ่าน Provider ID ได้ทันที
+                      </p>
+                    </div>
                     <button
                       onClick={() => setActiveTab('oauth-idp')}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-sm"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md shadow-emerald-600/20"
                     >
-                      <Plus className="w-3.5 h-3.5" />
+                      <Plus className="w-4 h-4" />
                       <span>ลงทะเบียนแอปพลิเคชันใหม่</span>
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {clients.map((app: any) => (
-                      <div
-                        key={app.id || app.clientId}
-                        className="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-2xs space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-xs text-zinc-900 dark:text-zinc-100">
-                            {app.name}
-                          </span>
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                            พร้อมใช้งาน
-                          </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {clients.map((app: any, idx: number) => {
+                      // สุ่มโทนสีไอคอนและการ์ดให้ดูมีชีวิตชีวาและแยกแยะง่าย
+                      const iconStyles = [
+                        'from-emerald-500 to-teal-600 shadow-emerald-500/20 text-white',
+                        'from-blue-500 to-indigo-600 shadow-blue-500/20 text-white',
+                        'from-teal-500 to-cyan-600 shadow-teal-500/20 text-white',
+                        'from-violet-500 to-purple-600 shadow-violet-500/20 text-white',
+                        'from-amber-500 to-orange-600 shadow-amber-500/20 text-white',
+                      ];
+                      const iconStyle = iconStyles[idx % iconStyles.length];
+
+                      return (
+                        <div
+                          key={app.id || app.clientId}
+                          className="group relative bg-white dark:bg-zinc-900/90 hover:bg-gradient-to-b hover:from-white hover:to-emerald-50/30 dark:hover:to-emerald-950/20 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 hover:border-emerald-400/60 dark:hover:border-emerald-600/60 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+                        >
+                          <div className="space-y-3.5">
+                            {/* Card Header: Icon + Badge */}
+                            <div className="flex items-start justify-between gap-3">
+                              <div
+                                className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${iconStyle} shadow-md flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}
+                              >
+                                <Building2 className="w-6 h-6" />
+                              </div>
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0 shadow-2xs">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                พร้อมใช้งาน
+                              </span>
+                            </div>
+
+                            {/* Title & Description */}
+                            <div>
+                              <h4 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-50 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
+                                {app.name}
+                              </h4>
+                              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                                {app.description || 'ระบบงานเชื่อมต่อการยืนยันตัวตนกลาง SSO รพ.หนองหาน [11018]'}
+                              </p>
+                            </div>
+
+                            {/* Client ID Pill */}
+                            <div className="p-2 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-mono text-zinc-600 dark:text-zinc-400">
+                              <span className="truncate max-w-[190px]">{app.clientId}</span>
+                              <button
+                                onClick={() => handleCopy(app.clientId, `app-cid-${app.clientId}`)}
+                                className="text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors ml-1 shrink-0"
+                                title="คัดลอก Client ID"
+                              >
+                                {copiedKey === `app-cid-${app.clientId}` ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Footer Info */}
+                          <div className="pt-3 mt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-400">
+                            <span className="flex items-center gap-1 truncate">
+                              <Fingerprint className="w-3 h-3 text-emerald-600 shrink-0" />
+                              <span className="truncate">
+                                {app.createdByName ? `โดย: ${app.createdByName}` : 'ระบบส่วนกลาง รพ.หนองหาน'}
+                              </span>
+                            </span>
+                            <span className="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 rounded-md font-medium shrink-0">
+                              OAuth 2.0
+                            </span>
+                          </div>
                         </div>
-                        {app.description && (
-                          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2">
-                            {app.description}
-                          </p>
-                        )}
-                        {app.createdByName && currentUser?.isAdmin && (
-                          <p className="text-[10px] text-zinc-400 pt-1 border-t border-zinc-100 dark:border-zinc-800">
-                            ผู้ลงทะเบียน: {app.createdByName}
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
