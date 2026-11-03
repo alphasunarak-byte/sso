@@ -797,38 +797,51 @@ export default function ConsolePage() {
                       return (
                         <div
                           key={app.id || app.clientId}
-                          className="group relative bg-white dark:bg-zinc-900/90 hover:bg-gradient-to-b hover:from-white hover:to-emerald-50/30 dark:hover:to-emerald-950/20 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 hover:border-emerald-400/60 dark:hover:border-emerald-600/60 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+                          onClick={() => {
+                            if (app.redirectUris && app.redirectUris[0]) {
+                              window.open(app.redirectUris[0], '_blank');
+                            }
+                          }}
+                          className="group relative bg-white dark:bg-zinc-900/90 hover:bg-gradient-to-b hover:from-white hover:to-emerald-50/40 dark:hover:to-emerald-950/30 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 hover:border-emerald-500/80 dark:hover:border-emerald-500/80 shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-200 flex flex-col justify-between cursor-pointer"
                         >
                           <div className="space-y-3.5">
-                            {/* Card Header: Icon + Badge */}
+                            {/* Card Header: Icon + Badge + Open Link */}
                             <div className="flex items-start justify-between gap-3">
                               <div
-                                className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${iconStyle} shadow-md flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}
+                                className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${iconStyle} shadow-md flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}
                               >
                                 <Building2 className="w-6 h-6" />
                               </div>
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0 shadow-2xs">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                พร้อมใช้งาน
-                              </span>
+                              <div className="flex items-center gap-1.5">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0 shadow-2xs">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                  พร้อมใช้งาน
+                                </span>
+                                <div className="p-1 rounded-lg text-zinc-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/60 transition-colors" title="เปิดระบบงานนี้">
+                                  <ExternalLink className="w-4 h-4" />
+                                </div>
+                              </div>
                             </div>
 
-                            {/* Title & Description */}
-                            <div>
-                              <h4 className="font-bold text-sm sm:text-base text-zinc-900 dark:text-zinc-50 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
+                            {/* Title (Full Name, No Truncate) & Description */}
+                            <div className="space-y-1.5">
+                              <h4 className="font-bold text-base sm:text-lg text-zinc-900 dark:text-zinc-50 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors leading-snug break-words">
                                 {app.name}
                               </h4>
-                              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                              <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed break-words">
                                 {app.description || 'ระบบงานเชื่อมต่อการยืนยันตัวตนกลาง SSO รพ.หนองหาน [11018]'}
                               </p>
                             </div>
 
-                            {/* Client ID Pill */}
-                            <div className="p-2 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-mono text-zinc-600 dark:text-zinc-400">
-                              <span className="truncate max-w-[190px]">{app.clientId}</span>
+                            {/* Client ID Pill (Click-to-Copy without triggering card link) */}
+                            <div
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-2 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] font-mono text-zinc-600 dark:text-zinc-400"
+                            >
+                              <span className="truncate max-w-[200px]">{app.clientId}</span>
                               <button
                                 onClick={() => handleCopy(app.clientId, `app-cid-${app.clientId}`)}
-                                className="text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors ml-1 shrink-0"
+                                className="text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors ml-1 shrink-0 p-1 rounded-md hover:bg-zinc-200 dark:hover:bg-zinc-700"
                                 title="คัดลอก Client ID"
                               >
                                 {copiedKey === `app-cid-${app.clientId}` ? (
@@ -840,16 +853,17 @@ export default function ConsolePage() {
                             </div>
                           </div>
 
-                          {/* Footer Info */}
+                          {/* Footer Info & Quick Link Button */}
                           <div className="pt-3 mt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-400">
-                            <span className="flex items-center gap-1 truncate">
-                              <Fingerprint className="w-3 h-3 text-emerald-600 shrink-0" />
+                            <span className="flex items-center gap-1 truncate max-w-[170px]">
+                              <Fingerprint className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                               <span className="truncate">
                                 {app.createdByName ? `โดย: ${app.createdByName}` : 'ระบบส่วนกลาง รพ.หนองหาน'}
                               </span>
                             </span>
-                            <span className="text-[10px] bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 rounded-md font-medium shrink-0">
-                              OAuth 2.0
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 group-hover:underline">
+                              <span>เข้าสู่ระบบงาน</span>
+                              <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                             </span>
                           </div>
                         </div>
