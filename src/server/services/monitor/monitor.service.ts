@@ -135,7 +135,7 @@ export class MonitorService {
       timestamp: new Date().toLocaleTimeString('th-TH'),
       environment: params.environment || 'PRD',
       serviceName: params.serviceName || 'Super App By รพ.หนองหาน',
-      status: params.statusCode < 400 ? 'SUCCESS' : 'FAILED',
+      status: params.statusCode < 400 ? 'SUCCESS' : 'ERROR',
     };
 
     inMemoryMetrics.recentLogs.unshift(logEntry);

@@ -2,8 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
   poweredByHeader: false, // ปิด Header 'X-Powered-By: Next.js' ตามมาตรฐาน OWASP
   async headers() {
     return [
