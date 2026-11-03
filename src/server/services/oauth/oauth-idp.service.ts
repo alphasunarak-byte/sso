@@ -16,7 +16,8 @@ interface AuthCodeEntry {
 const globalClients: Map<string, OAuthClientApp> = new Map();
 const globalAuthCodes: Map<string, AuthCodeEntry> = new Map();
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+// รองรับทั้ง Vercel Serverless (/tmp) และ Local Development (process.cwd()/data)
+const DATA_DIR = process.env.VERCEL ? path.join('/tmp', 'nhh-data') : path.join(process.cwd(), 'data');
 const CLIENTS_FILE = path.join(DATA_DIR, 'oauth-clients.json');
 
 function getDefaultClients(): OAuthClientApp[] {

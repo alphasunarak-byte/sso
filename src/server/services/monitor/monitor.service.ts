@@ -31,7 +31,8 @@ interface StoredMetrics {
   recentLogs: ApiMonitorLog[];
 }
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+// รองรับทั้ง Vercel Serverless (/tmp) และ Local Development (process.cwd()/data)
+const DATA_DIR = process.env.VERCEL ? path.join('/tmp', 'nhh-data') : path.join(process.cwd(), 'data');
 const METRICS_FILE = path.join(DATA_DIR, 'api-metrics.json');
 
 const startTimeServer = Date.now();
