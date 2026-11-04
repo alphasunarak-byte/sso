@@ -23,23 +23,6 @@ const CLIENTS_FILE = path.join(DATA_DIR, 'oauth-clients.json');
 function getDefaultClients(): OAuthClientApp[] {
   return [
     {
-      id: 'client-superapp-01',
-      clientId: 'super-app-nhh-11018',
-      clientSecret: 'secret_nhh_superapp_2026',
-      name: 'Super App By รพ.หนองหาน [11018]',
-      description: 'ระบบแอปพลิเคชันกลางและมอนิเตอร์ API โรงพยาบาลหนองหาน',
-      redirectUris: [
-        'http://localhost:3030/api/auth/callback',
-        'http://127.0.0.1:3030/api/auth/callback',
-        'http://localhost:3000/api/auth/callback',
-        'http://localhost:3000/api/auth/callback/nhh-sso',
-        'https://superapp.nhh.go.th/callback',
-      ],
-      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
-      isTrusted: true,
-      createdAt: '2026-01-01T00:00:00.000Z',
-    },
-    {
       id: 'client-nhh-income-02',
       clientId: 'nhh-income-platform-11018',
       clientSecret: 'secret_nhh_income_platform_prod',
@@ -66,6 +49,19 @@ function getDefaultClients(): OAuthClientApp[] {
       allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018', 'hospital.read', 'hospital.write'],
       isTrusted: true,
       createdAt: '2026-03-01T00:00:00.000Z',
+    },
+    {
+      id: 'client-nhh-phr-04',
+      clientId: 'nhh-phr-11018',
+      clientSecret: 'secret_nhh_phr_secure_2026',
+      name: 'nhh-phr (ระบบประวัติสุขภาพอิเล็กทรอนิกส์ส่วนบุคคล)',
+      description: 'ระบบบันทึกประวัติสุขภาพอิเล็กทรอนิกส์ส่วนบุคคล โรงพยาบาลหนองหาน',
+      redirectUris: [
+        'https://nhh-phr.hospital.go.th/callback',
+      ],
+      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
+      isTrusted: true,
+      createdAt: '2026-11-04T00:00:00.000Z',
     },
   ];
 }
