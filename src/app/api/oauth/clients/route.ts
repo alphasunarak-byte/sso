@@ -55,12 +55,16 @@ function isClientOwner(client: OAuthClientApp, user: any): boolean {
   const userCid = (user.cid || user.citizen_id || '').toString().trim();
   const userHashCid = (user.hashCid || user.hash_cid || '').toString().trim().toLowerCase();
   const userProviderId = (user.providerId || user.accountId || '').toString().trim();
+  const userName = (user.fullName || user.name || '').toString().trim();
 
   if (client.createdByCid) {
     if (userCid && client.createdByCid === userCid) return true;
     if (userHashCid && client.createdByCid.toLowerCase() === userHashCid) return true;
   }
   if (client.createdById && userProviderId && client.createdById === userProviderId) {
+    return true;
+  }
+  if (client.createdByName && userName && client.createdByName === userName) {
     return true;
   }
   return false;
@@ -78,7 +82,7 @@ export async function GET(request: NextRequest) {
     }
     const isOwner = user && isClientOwner(client, user);
     if (isOwner) {
-      return NextResponse.json({ success: true, client });
+      return NextResponse.json({ success: true, client: { ...client, canEdit: true, canDelete: true } });
     }
     return NextResponse.json({
       success: true,
@@ -90,6 +94,9 @@ export async function GET(request: NextRequest) {
         allowedScopes: client.allowedScopes,
         isTrusted: client.isTrusted,
         createdAt: client.createdAt,
+        createdByName: client.createdByName,
+        canEdit: false,
+        canDelete: false,
       },
     });
   }
@@ -100,13 +107,19 @@ export async function GET(request: NextRequest) {
 
   const allClients = OAuthIdpService.listClients();
 
-  // ผู้ดูแลระบบ (Admin) เห็นแอปทั้งหมด, ผู้ใช้งานทั่วไปเห็นเฉพาะแอปของตนเอง
-  if (user.isAdmin) {
-    return NextResponse.json({ success: true, clients: allClients });
-  } else {
-    const myClients = allClients.filter((c) => isClientOwner(c, user));
-    return NextResponse.json({ success: true, clients: myClients });
-  }
+  // ส่งคืนแอปพลิเคชันทั้งหมดในโรงพยาบาลให้ผู้ใช้งานทุกคนเห็น
+  // โดยระบุสิทธิ์ canEdit / canDelete เฉพาะแอปที่เป็นเจ้าของ หรือมีสิทธิ์ Admin เท่านั้น
+  const clientsWithPermissions = allClients.map((c) => {
+    const isOwnerOrAdmin = isClientOwner(c, user);
+    return {
+      ...c,
+      canEdit: Boolean(isOwnerOrAdmin),
+      canDelete: Boolean(isOwnerOrAdmin),
+      clientSecret: isOwnerOrAdmin ? c.clientSecret : '••••••••••••••••••••••••••••••••',
+    };
+  });
+
+  return NextResponse.json({ success: true, clients: clientsWithPermissions });
 }
 
 export async function POST(request: NextRequest) {

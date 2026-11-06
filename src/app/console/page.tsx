@@ -448,7 +448,7 @@ export default function ConsolePage() {
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
               >
-                {currentUser?.isAdmin ? 'OAuth 2.0 IdP & Clients' : 'OAuth 2.0 IdP (แอปของฉัน)'}
+                OAuth 2.0 IdP & Clients
                 {activeTab === 'oauth-idp' && (
                   <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-emerald-600 rounded-full" />
                 )}
@@ -738,15 +738,11 @@ export default function ConsolePage() {
                     <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
                       <Share2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                       <span>
-                        {currentUser?.isAdmin
-                          ? `ระบบงานและแอปพลิเคชันทั้งหมดในโรงพยาบาล [11018] (${clients.length})`
-                          : `แอปพลิเคชันของฉันที่เชื่อมต่อ SSO (${clients.length})`}
+                        {`ระบบงานและแอปพลิเคชันทั้งหมดในโรงพยาบาล [11018] (${clients.length})`}
                       </span>
                     </h3>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                      {currentUser?.isAdmin
-                        ? 'รวมศูนย์ระบบสารสนเทศ เวชระเบียน และบริการดิจิทัลทั้งหมดของโรงพยาบาลหนองหานที่รองรับการยืนยันตัวตน SSO'
-                        : 'ระบบงานที่ท่านลงทะเบียนไว้เพื่อใช้งานร่วมกับ Single Sign-On'}
+                      รวมศูนย์ระบบสารสนเทศ เวชระเบียน และบริการดิจิทัลทั้งหมดของโรงพยาบาลหนองหานที่รองรับการยืนยันตัวตน SSO
                     </p>
                   </div>
                   <button
@@ -754,7 +750,7 @@ export default function ConsolePage() {
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800 transition-colors shrink-0 shadow-2xs"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>{currentUser?.isAdmin ? 'จัดการแอปทั้งหมด' : 'ลงทะเบียนแอปใหม่'}</span>
+                    <span>ลงทะเบียนแอปใหม่</span>
                   </button>
                 </div>
 
@@ -1414,15 +1410,11 @@ export default function ConsolePage() {
                     <h2 className="font-bold text-base text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                       <Code2 className="w-5 h-5 text-indigo-500" />
                       <span>
-                        {currentUser?.isAdmin
-                          ? `รายการ Client Applications ทั้งหมดในระบบ (${clients.length} แอป)`
-                          : `รายการ Client Applications ของฉัน (${clients.length} แอป)`}
+                        {`รายการ Client Applications ทั้งหมดในระบบ (${clients.length} แอป)`}
                       </span>
                     </h2>
                     <p className="text-xs text-zinc-400 mt-0.5">
-                      {currentUser?.isAdmin
-                        ? 'ระบบและแอปพลิเคชันทั้งหมดที่ได้รับสิทธิ์เชื่อมต่อ SSO ผ่าน OAuth 2.0 ของ รพ.หนองหาน'
-                        : 'ระบบและแอปพลิเคชันของท่านที่ลงทะเบียนเชื่อมต่อ SSO ผ่าน OAuth 2.0'}
+                      ระบบและแอปพลิเคชันทั้งหมดที่เชื่อมต่อ SSO ใน รพ.หนองหาน (คุณสามารถแก้ไข/ลบเฉพาะแอปที่ตนเองเป็นเจ้าของ หรือสิทธิ์ Admin)
                     </p>
                   </div>
                 </div>
@@ -1434,11 +1426,7 @@ export default function ConsolePage() {
                   </div>
                 ) : clients.length === 0 ? (
                   <div className="py-10 text-center text-xs text-zinc-400 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl space-y-2">
-                    <p>
-                      {currentUser?.isAdmin
-                        ? 'ยังไม่มีแอปพลิเคชันลงทะเบียนในระบบ'
-                        : 'ท่านยังไม่มีแอปพลิเคชันของตนเอง สามารถลงทะเบียนได้ที่แบบฟอร์มด้านล่าง'}
-                    </p>
+                    <p>ยังไม่มีแอปพลิเคชันลงทะเบียนในระบบ สามารถลงทะเบียนได้ที่แบบฟอร์มด้านล่าง</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -1456,39 +1444,55 @@ export default function ConsolePage() {
                               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                                 Trusted App
                               </span>
+                              {app.canEdit && !currentUser?.isAdmin && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+                                  แอปของคุณ
+                                </span>
+                              )}
                             </div>
                             {app.description && (
                               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                                 {app.description}
                               </p>
                             )}
-                            {app.createdByName && currentUser?.isAdmin && (
-                              <p className="text-[11px] text-zinc-400 mt-1">
-                                👤 สร้างโดย: <strong className="text-zinc-700 dark:text-zinc-300">{app.createdByName}</strong> {app.createdByCid ? `(CID: ${app.createdByCid})` : ''}
+                            {app.createdByName && (
+                              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 flex items-center gap-1.5">
+                                <span>👤 สร้างโดย:</span>
+                                <strong className="text-zinc-700 dark:text-zinc-300 font-semibold">{app.createdByName}</strong>
+                                {currentUser?.isAdmin && app.createdByCid ? (
+                                  <span className="text-zinc-400 font-mono">(CID: {app.createdByCid})</span>
+                                ) : null}
                               </p>
                             )}
                           </div>
 
-                          {/* Action Buttons: แก้ไข & ลบ */}
-                          <div className="flex items-center gap-2 shrink-0">
-                            <button
-                              onClick={() => startEdit(app)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-zinc-700 dark:text-zinc-200 hover:text-emerald-700 dark:hover:text-emerald-400 bg-white dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-300 transition-all shadow-2xs"
-                              title="แก้ไขข้อมูลแอปพลิเคชัน"
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                              <span>แก้ไข</span>
-                            </button>
+                          {/* Action Buttons: แก้ไข & ลบ — เฉพาะเจ้าของหรือ Admin เท่านั้น */}
+                          {app.canEdit ? (
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                onClick={() => startEdit(app)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-zinc-700 dark:text-zinc-200 hover:text-emerald-700 dark:hover:text-emerald-400 bg-white dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-zinc-200 dark:border-zinc-700 hover:border-emerald-300 transition-all shadow-2xs"
+                                title="แก้ไขข้อมูลแอปพลิเคชัน"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                                <span>แก้ไข</span>
+                              </button>
 
-                            <button
-                              onClick={() => setDeletingClient(app)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-zinc-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 bg-white dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 border border-zinc-200 dark:border-zinc-700 hover:border-red-300 transition-all shadow-2xs"
-                              title="ลบแอปพลิเคชัน"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              <span>ลบ</span>
-                            </button>
-                          </div>
+                              <button
+                                onClick={() => setDeletingClient(app)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-zinc-700 dark:text-zinc-200 hover:text-red-600 dark:hover:text-red-400 bg-white dark:bg-zinc-800 hover:bg-red-50 dark:hover:bg-red-950/40 border border-zinc-200 dark:border-zinc-700 hover:border-red-300 transition-all shadow-2xs"
+                                title="ลบแอปพลิเคชัน"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>ลบ</span>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800/60 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700/60 shrink-0">
+                              <Lock className="w-3.5 h-3.5 text-zinc-400" />
+                              <span>เฉพาะเจ้าของหรือ Admin แก้ไขได้</span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Client ID & Secret Display */}
@@ -1518,30 +1522,44 @@ export default function ConsolePage() {
                             <label className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 block mb-1">
                               Client Secret
                             </label>
-                            <div className="flex items-center gap-2">
-                              <input
-                                type={visibleSecrets[app.clientId] ? 'text' : 'password'}
-                                readOnly
-                                value={app.clientSecret || '••••••••••••••••'}
-                                className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-zinc-800 dark:text-zinc-200"
-                              />
-                              <button
-                                onClick={() => toggleSecret(app.clientId)}
-                                className="p-1.5 bg-white dark:bg-zinc-800 hover:bg-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-600 dark:text-zinc-300"
-                                title="แสดง/ซ่อนคีย์"
-                              >
-                                {visibleSecrets[app.clientId] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                              </button>
-                              {app.clientSecret && (
+                            {app.canEdit ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type={visibleSecrets[app.clientId] ? 'text' : 'password'}
+                                  readOnly
+                                  value={app.clientSecret || '••••••••••••••••'}
+                                  className="flex-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-zinc-800 dark:text-zinc-200"
+                                />
                                 <button
-                                  onClick={() => handleCopy(app.clientSecret, `csec-${app.clientId}`)}
+                                  onClick={() => toggleSecret(app.clientId)}
                                   className="p-1.5 bg-white dark:bg-zinc-800 hover:bg-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-600 dark:text-zinc-300"
-                                  title="คัดลอก Client Secret"
+                                  title="แสดง/ซ่อนคีย์"
                                 >
-                                  {copiedKey === `csec-${app.clientId}` ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                  {visibleSecrets[app.clientId] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                                 </button>
-                              )}
-                            </div>
+                                {app.clientSecret && (
+                                  <button
+                                    onClick={() => handleCopy(app.clientSecret, `csec-${app.clientId}`)}
+                                    className="p-1.5 bg-white dark:bg-zinc-800 hover:bg-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-600 dark:text-zinc-300"
+                                    title="คัดลอก Client Secret"
+                                  >
+                                    {copiedKey === `csec-${app.clientId}` ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                  </button>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="password"
+                                  readOnly
+                                  value="••••••••••••••••"
+                                  className="flex-1 bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs font-mono text-zinc-400 dark:text-zinc-500 cursor-not-allowed"
+                                />
+                                <span className="text-[11px] text-zinc-400 dark:text-zinc-500 italic px-1 shrink-0">
+                                  🔒 ซ่อนคีย์ลับ
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
 
