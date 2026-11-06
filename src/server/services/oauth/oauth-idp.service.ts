@@ -38,73 +38,35 @@ function getDefaultClients(): OAuthClientApp[] {
       createdAt: '2026-11-06T00:00:00.000Z',
       createdByName: 'ศุภชัย สุนารักษ์',
     },
-    {
-      id: 'client-nhh-income-01',
-      clientId: 'nhh-income-platform-11018',
-      clientSecret: 'secret_nhh_income_prod_2026',
-      name: 'NHH-Income Platform (ระบบบริหารรายได้)',
-      description: 'ระบบวิเคราะห์และบริหารรายได้ทุกกองทุน รพ.หนองหาน',
-      redirectUris: [
-        'http://localhost:3000/api/auth/provider-id/callback',
-        'http://localhost:3000/api/auth/callback',
-        'http://localhost:3030/api/auth/callback',
-      ],
-      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
-      isTrusted: true,
-      createdAt: '2026-02-15T00:00:00.000Z',
-      createdByName: 'ศุภชัย สุนารักษ์',
-    },
-    {
-      id: 'client-hosxp-conn-01',
-      clientId: 'hosxp-connector-11018',
-      clientSecret: 'secret_hosxp_gateway_prod_2026',
-      name: 'HOSxP Connector & API Gateway',
-      description: 'เชื่อมโยงข้อมูลเวชระเบียนและระบบบริการสุขภาพโรงพยาบาลหนองหาน',
-      redirectUris: ['http://localhost:8080/oauth/callback'],
-      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
-      isTrusted: true,
-      createdAt: '2026-02-15T00:00:00.000Z',
-      createdByName: 'ศุภชัย สุนารักษ์',
-    },
   ];
 }
 
 function loadClients(): Map<string, OAuthClientApp> {
   const map = new Map<string, OAuthClientApp>();
 
-  // 1. โหลด Production Clients เริ่มต้นที่ Build-in ในโค้ดเสมอ (รับประกันว่าไม่สูญหายบน Serverless)
+  // 1. ตรวจสอบไฟล์ Runtime หรือ Base เพื่อโหลดรายการที่เป็นจริง
+  const targetFile = fs.existsSync(RUNTIME_CLIENTS_FILE)
+    ? RUNTIME_CLIENTS_FILE
+    : (fs.existsSync(BASE_CLIENTS_FILE) ? BASE_CLIENTS_FILE : null);
+
+  if (targetFile) {
+    try {
+      const content = fs.readFileSync(targetFile, 'utf-8');
+      const parsed = JSON.parse(content);
+      if (Array.isArray(parsed)) {
+        for (const client of parsed) {
+          map.set(client.clientId, client);
+        }
+        return map;
+      }
+    } catch (err) {
+      console.warn('[OAuthIdpService] Error reading client file:', err);
+    }
+  }
+
+  // 2. หากยังไม่มีไฟล์ใดๆ ให้ใช้เฉพาะ Production Client จริงของ NHH SMART PHR เท่านั้น
   for (const client of getDefaultClients()) {
     map.set(client.clientId, client);
-  }
-
-  // 2. โหลดจากไฟล์ฐานข้อมูลถาวรของระบบ (ถ้ามี)
-  try {
-    if (fs.existsSync(BASE_CLIENTS_FILE)) {
-      const content = fs.readFileSync(BASE_CLIENTS_FILE, 'utf-8');
-      const parsed = JSON.parse(content);
-      if (Array.isArray(parsed)) {
-        for (const client of parsed) {
-          map.set(client.clientId, client);
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('[OAuthIdpService] Error reading base oauth-clients.json:', err);
-  }
-
-  // 3. ถ้ามีไฟล์ Runtime ให้ merge เพิ่มเติมหรืออัปเดต
-  try {
-    if (RUNTIME_CLIENTS_FILE !== BASE_CLIENTS_FILE && fs.existsSync(RUNTIME_CLIENTS_FILE)) {
-      const content = fs.readFileSync(RUNTIME_CLIENTS_FILE, 'utf-8');
-      const parsed = JSON.parse(content);
-      if (Array.isArray(parsed)) {
-        for (const client of parsed) {
-          map.set(client.clientId, client);
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('[OAuthIdpService] Error reading runtime oauth-clients.json:', err);
   }
 
   return map;
