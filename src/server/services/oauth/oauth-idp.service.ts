@@ -21,49 +21,8 @@ const DATA_DIR = process.env.VERCEL ? path.join('/tmp', 'nhh-data') : path.join(
 const CLIENTS_FILE = path.join(DATA_DIR, 'oauth-clients.json');
 
 function getDefaultClients(): OAuthClientApp[] {
-  return [
-    {
-      id: 'client-nhh-income-02',
-      clientId: 'nhh-income-platform-11018',
-      clientSecret: 'secret_nhh_income_platform_prod',
-      name: 'NHH-Income Platform (ระบบบริหารรายได้)',
-      description: 'ระบบวิเคราะห์และบริหารรายได้ทุกกองทุน รพ.หนองหาน',
-      redirectUris: [
-        'http://localhost:3000/api/auth/provider-id/callback',
-        'http://localhost:3000/api/auth/callback',
-        'http://localhost:3030/api/auth/callback',
-      ],
-      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
-      isTrusted: true,
-      createdAt: '2026-02-15T00:00:00.000Z',
-    },
-    {
-      id: 'client-hosxp-03',
-      clientId: 'hosxp-connector-11018',
-      clientSecret: 'secret_hosxp_nhh_connect_secure',
-      name: 'HOSxP Connector & API Gateway',
-      description: 'เชื่อมโยงข้อมูลเวชระเบียนและระบบบริการสุขภาพโรงพยาบาลหนองหาน',
-      redirectUris: [
-        'http://localhost:8080/oauth/callback',
-      ],
-      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018', 'hospital.read', 'hospital.write'],
-      isTrusted: true,
-      createdAt: '2026-03-01T00:00:00.000Z',
-    },
-    {
-      id: 'client-nhh-phr-04',
-      clientId: 'nhh-phr-11018',
-      clientSecret: 'secret_nhh_phr_secure_2026',
-      name: 'nhh-phr (ระบบประวัติสุขภาพอิเล็กทรอนิกส์ส่วนบุคคล)',
-      description: 'ระบบบันทึกประวัติสุขภาพอิเล็กทรอนิกส์ส่วนบุคคล โรงพยาบาลหนองหาน',
-      redirectUris: [
-        'https://nhh-phr.hospital.go.th/callback',
-      ],
-      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
-      isTrusted: true,
-      createdAt: '2026-11-04T00:00:00.000Z',
-    },
-  ];
+  // ไม่มี mock หรือระบบจำลอง เริ่มต้นจากรายการว่าง ถ้าต้องการใช้งานระบบใด ให้ลงทะเบียนผ่านหน้าเว็บเท่านั้น
+  return [];
 }
 
 function loadClients(): Map<string, OAuthClientApp> {
@@ -83,16 +42,12 @@ function loadClients(): Map<string, OAuthClientApp> {
     console.warn('[OAuthIdpService] Error reading oauth-clients.json:', err);
   }
 
-  // สร้างค่าเริ่มต้นเฉพาะกรณีที่ยังไม่เคยมีไฟล์ oauth-clients.json เท่านั้น
-  const defaultClients = getDefaultClients();
-  for (const client of defaultClients) {
-    map.set(client.clientId, client);
-  }
+  // หากยังไม่มีไฟล์ ให้สร้างไฟล์เปล่า ไม่มีระบบจำลอง
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
-    fs.writeFileSync(CLIENTS_FILE, JSON.stringify(defaultClients, null, 2), 'utf-8');
+    fs.writeFileSync(CLIENTS_FILE, JSON.stringify([], null, 2), 'utf-8');
   } catch (err) {
     console.error('Failed to initialize oauth-clients.json:', err);
   }
