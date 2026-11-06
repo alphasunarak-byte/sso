@@ -44,7 +44,7 @@ import { Environment } from '@/schemas/auth.schema';
 
 export default function ConsolePage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'overview' | 'api-monitor' | 'credentials' | 'logs' | 'oauth-idp'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'profile' | 'api-monitor' | 'credentials' | 'logs' | 'oauth-idp'>('overview');
   const [environment, setEnvironment] = useState<Environment>('PRD');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [visibleSecrets, setVisibleSecrets] = useState<Record<string, boolean>>({});
@@ -434,8 +434,22 @@ export default function ConsolePage() {
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
               >
-                ภาพรวม
+                ภาพรวม (ระบบงาน)
                 {activeTab === 'overview' && (
+                  <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-emerald-600 rounded-full" />
+                )}
+              </button>
+
+              <button
+                onClick={() => setActiveTab('profile')}
+                className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors relative ${
+                  activeTab === 'profile'
+                    ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50/70 dark:bg-emerald-950/40'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                }`}
+              >
+                ข้อมูล Provider ID / บัญชีบุคลากร
+                {activeTab === 'profile' && (
                   <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-emerald-600 rounded-full" />
                 )}
               </button>
@@ -492,8 +506,12 @@ export default function ConsolePage() {
           <div className="flex items-center gap-3">
             <ThemeToggle />
 
-            {/* User Profile Pill */}
-            <div className="flex items-center gap-2 pl-2">
+            {/* User Profile Pill (Click to open Provider ID Profile) */}
+            <button
+              onClick={() => setActiveTab('profile')}
+              className="flex items-center gap-2 pl-2 hover:opacity-80 transition-opacity text-left"
+              title="ดูข้อมูล Provider ID และบัญชีบุคลากร"
+            >
               <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold flex items-center justify-center text-sm border border-emerald-200 dark:border-emerald-800">
                 {currentUser?.avatarChar || 'น'}
               </div>
@@ -509,7 +527,7 @@ export default function ConsolePage() {
                   )}
                 </span>
               </div>
-            </div>
+            </button>
 
             <button
               onClick={handleLogout}
@@ -526,8 +544,12 @@ export default function ConsolePage() {
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 flex-1 flex flex-col md:flex-row gap-6">
         {/* Left Sidebar */}
         <aside className="w-full md:w-64 shrink-0 space-y-4">
-          {/* User Card */}
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex items-center gap-3">
+          {/* User Card (Click to open Provider ID Profile) */}
+          <div
+            onClick={() => setActiveTab('profile')}
+            className="bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex items-center gap-3 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors"
+            title="คลิกเพื่อดูข้อมูล Provider ID และบัญชีบุคลากร"
+          >
             <div className="w-11 h-11 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-lg flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shrink-0">
               {currentUser?.avatarChar || 'น'}
             </div>
@@ -552,7 +574,19 @@ export default function ConsolePage() {
               }`}
             >
               <LayoutDashboard className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>ภาพรวม</span>
+              <span>ภาพรวม (ระบบงาน)</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === 'profile'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/60'
+              }`}
+            >
+              <Fingerprint className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>ข้อมูล Provider ID / บุคลากร</span>
             </button>
 
             <button
@@ -564,7 +598,7 @@ export default function ConsolePage() {
               }`}
             >
               <Share2 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-              <span>{currentUser?.isAdmin ? 'OAuth 2.0 IdP & Clients' : 'OAuth 2.0 IdP (แอปของฉัน)'}</span>
+              <span>OAuth 2.0 IdP & Clients</span>
             </button>
 
             {currentUser?.isAdmin && (
@@ -635,124 +669,31 @@ export default function ConsolePage() {
 
         {/* Right Main Content Area */}
         <main className="flex-1 space-y-6">
-          {/* TAB 1: ภาพรวม (Overview) */}
+          {/* TAB 1: ภาพรวม (Overview) — ศูนย์รวมระบบงานและแอปพลิเคชันทั้งหมดเท่านั้น */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              {/* Header */}
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-                  ภาพรวม
-                </h1>
-                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                  ข้อมูลบัญชีและสิทธิ์การใช้งาน Provider ID ของฉัน
-                </p>
-              </div>
-
-              {/* User Profile Card */}
-              <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 sm:p-6 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-2xl flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shrink-0">
-                  {currentUser?.avatarChar || (currentUser?.fullName ? currentUser.fullName.charAt(0) : 'น')}
-                </div>
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                      {currentUser?.fullName}
-                    </h2>
-                    {currentUser?.isAdmin ? (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-2xs">
-                        <span>👑</span>
-                        <span>ผู้ดูแลระบบ (Admin)</span>
-                      </span>
-                    ) : (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
-                        ผู้ใช้งานทั่วไป
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    {currentUser?.hospitalName || 'โรงพยาบาลหนองหาน'} [{currentUser?.hospitalCode || '11018'}] • {currentUser?.position || 'บุคลากรทางการแพทย์'}
+              {/* Header Title & Actions */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200/80 dark:border-zinc-800">
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-zinc-50 flex items-center gap-2.5 tracking-tight">
+                    <LayoutDashboard className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                    <span>ระบบงานและแอปพลิเคชันทั้งหมดในโรงพยาบาล [11018] ({clients.length})</span>
+                  </h1>
+                  <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                    ศูนย์กลางระบบงานสารสนเทศ เวชระเบียน และบริการดิจิทัลทั้งหมดของโรงพยาบาลหนองหานที่รองรับการยืนยันตัวตน SSO
                   </p>
                 </div>
-              </div>
-
-              {/* Connected Account Section: Position & Affiliated Hospital */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                  ข้อมูล Provider ID / บัญชีบุคลากร
-                </h3>
-
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900">
-                        <Building2 className="w-5 h-5" />
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">ตำแหน่ง:</span>
-                          <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 rounded-md">
-                            {currentUser?.position || 'บุคลากรทางการแพทย์'}
-                          </span>
-                        </div>
-                        <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                          โรงพยาบาลสังกัด: {currentUser?.hospitalName || 'โรงพยาบาลหนองหาน'} [{currentUser?.hospitalCode || '11018'}]
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                        ยืนยันตัวตนแล้ว
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Provider ID Card Details */}
-                  <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                      <Fingerprint className="w-4 h-4 text-emerald-600" />
-                      <span>
-                        เชื่อมโยง Provider ID หน่วยบริการ: <strong>โรงพยาบาลหนองหาน [11018]</strong>
-                      </span>
-                    </div>
-
-                    {currentUser?.isAdmin && (
-                      <button
-                        onClick={() => handleRunApiTest('PROVIDER_ID')}
-                        disabled={isTestingApi}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                      >
-                        <KeyRound className="w-3.5 h-3.5" />
-                        <span>{isTestingApi ? 'กำลังตรวจสอบ...' : 'ตรวจสอบสถานะ API (PRD)'}</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
+                <button
+                  onClick={() => setActiveTab('oauth-idp')}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm shadow-emerald-600/20 transition-all shrink-0"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>ลงทะเบียนแอปใหม่</span>
+                </button>
               </div>
 
               {/* Connected Hospital Applications Section - Enhanced & Beautiful Grid */}
               <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-zinc-200/70 dark:border-zinc-800">
-                  <div>
-                    <h3 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-                      <Share2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      <span>
-                        {`ระบบงานและแอปพลิเคชันทั้งหมดในโรงพยาบาล [11018] (${clients.length})`}
-                      </span>
-                    </h3>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                      รวมศูนย์ระบบสารสนเทศ เวชระเบียน และบริการดิจิทัลทั้งหมดของโรงพยาบาลหนองหานที่รองรับการยืนยันตัวตน SSO
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setActiveTab('oauth-idp')}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800 transition-colors shrink-0 shadow-2xs"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>ลงทะเบียนแอปใหม่</span>
-                  </button>
-                </div>
 
                 {clients.length === 0 ? (
                   <div className="p-12 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-center space-y-4 shadow-sm">
@@ -889,8 +830,122 @@ export default function ConsolePage() {
             </div>
           )}
 
+          {/* TAB: ข้อมูล Provider ID และบัญชีบุคลากร */}
+          {activeTab === 'profile' && (
+            <div className="space-y-6">
+              {/* Header */}
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2.5">
+                  <Fingerprint className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                  <span>ข้อมูล Provider ID และบัญชีบุคลากร</span>
+                </h1>
+                <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                  ข้อมูลบัญชีผู้ใช้งาน สิทธิ์การเข้าถึง และการเชื่อมโยง Provider ID ของฉัน สังกัดโรงพยาบาลหนองหาน [11018]
+                </p>
+              </div>
+
+              {/* User Profile Card */}
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 sm:p-6 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold text-2xl flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shrink-0 shadow-inner">
+                    {currentUser?.avatarChar || (currentUser?.fullName ? currentUser.fullName.charAt(0) : 'น')}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                        {currentUser?.fullName}
+                      </h2>
+                      {currentUser?.isAdmin ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-700 flex items-center gap-1 shadow-2xs">
+                          <span>👑</span>
+                          <span>ผู้ดูแลระบบ (Admin)</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                          ผู้ใช้งานทั่วไป
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {currentUser?.hospitalName || 'โรงพยาบาลหนองหาน'} [{currentUser?.hospitalCode || '11018'}] • {currentUser?.position || 'บุคลากรทางการแพทย์'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    ยืนยันตัวตนแล้ว (Verified)
+                  </span>
+                </div>
+              </div>
+
+              {/* Connected Account Section: Position & Affiliated Hospital */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                  รายละเอียดการเชื่อมโยงระบบสาธารณสุข
+                </h3>
+
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 flex items-start gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900">
+                        <Building2 className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                          หน่วยบริการสังกัด
+                        </span>
+                        <strong className="text-sm font-bold text-zinc-900 dark:text-zinc-100 block mt-0.5">
+                          {currentUser?.hospitalName || 'โรงพยาบาลหนองหาน'} [{currentUser?.hospitalCode || '11018'}]
+                        </strong>
+                        <span className="text-xs text-zinc-500">จังหวัดอุดรธานี • เขตสุขภาพที่ 8</span>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 flex items-start gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-100 dark:border-teal-900">
+                        <Fingerprint className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                          ตำแหน่ง / บทบาทหน้าที่
+                        </span>
+                        <strong className="text-sm font-bold text-zinc-900 dark:text-zinc-100 block mt-0.5">
+                          {currentUser?.position || 'บุคลากรทางการแพทย์'}
+                        </strong>
+                        <span className="text-xs text-emerald-600 dark:text-emerald-400">สิทธิ์เข้าถึง: บุคลากรทางการแพทย์ รพ.หนองหาน</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Provider ID Card Details */}
+                  <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                      <Fingerprint className="w-4 h-4 text-emerald-600" />
+                      <span>
+                        เชื่อมโยง Provider ID หน่วยบริการ: <strong>โรงพยาบาลหนองหาน [11018]</strong>
+                      </span>
+                    </div>
+
+                    {currentUser?.isAdmin && (
+                      <button
+                        onClick={() => handleRunApiTest('PROVIDER_ID')}
+                        disabled={isTestingApi}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                      >
+                        <KeyRound className="w-3.5 h-3.5" />
+                        <span>{isTestingApi ? 'กำลังตรวจสอบ...' : 'ตรวจสอบสถานะ API (PRD)'}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Access Denied Card if non-admin attempts to view admin tab */}
-          {!currentUser?.isAdmin && activeTab !== 'overview' && activeTab !== 'oauth-idp' && (
+          {!currentUser?.isAdmin && activeTab !== 'overview' && activeTab !== 'profile' && activeTab !== 'oauth-idp' && (
             <div className="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-amber-200 dark:border-amber-900/60 shadow-sm text-center space-y-4">
               <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto">
                 <Lock className="w-6 h-6" />
