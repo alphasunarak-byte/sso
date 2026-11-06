@@ -22,13 +22,62 @@ const RUNTIME_DIR = process.env.VERCEL ? path.join('/tmp', 'nhh-data') : path.jo
 const RUNTIME_CLIENTS_FILE = path.join(RUNTIME_DIR, 'oauth-clients.json');
 
 function getDefaultClients(): OAuthClientApp[] {
-  return [];
+  return [
+    {
+      id: 'client-nhh-phr-01',
+      clientId: 'nhh-app-e8fa95daf52b',
+      clientSecret: 'secret_bcca33ff2da15f5d9b793e497e47ba73',
+      name: 'NHH SMART PHR',
+      description: 'ระบบระเบียนสุขภาพอิเล็กทรอนิกส์ส่วนบุคคล โรงพยาบาลหนองหาน (EMR & PHR)',
+      redirectUris: [
+        'http://192.168.12.253:3456/api/auth/callback',
+        'http://localhost:3456/api/auth/callback',
+      ],
+      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
+      isTrusted: true,
+      createdAt: '2026-11-06T00:00:00.000Z',
+      createdByName: 'ศุภชัย สุนารักษ์',
+    },
+    {
+      id: 'client-nhh-income-01',
+      clientId: 'nhh-income-platform-11018',
+      clientSecret: 'secret_nhh_income_prod_2026',
+      name: 'NHH-Income Platform (ระบบบริหารรายได้)',
+      description: 'ระบบวิเคราะห์และบริหารรายได้ทุกกองทุน รพ.หนองหาน',
+      redirectUris: [
+        'http://localhost:3000/api/auth/provider-id/callback',
+        'http://localhost:3000/api/auth/callback',
+        'http://localhost:3030/api/auth/callback',
+      ],
+      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
+      isTrusted: true,
+      createdAt: '2026-02-15T00:00:00.000Z',
+      createdByName: 'ศุภชัย สุนารักษ์',
+    },
+    {
+      id: 'client-hosxp-conn-01',
+      clientId: 'hosxp-connector-11018',
+      clientSecret: 'secret_hosxp_gateway_prod_2026',
+      name: 'HOSxP Connector & API Gateway',
+      description: 'เชื่อมโยงข้อมูลเวชระเบียนและระบบบริการสุขภาพโรงพยาบาลหนองหาน',
+      redirectUris: ['http://localhost:8080/oauth/callback'],
+      allowedScopes: ['openid', 'profile', 'provider', 'hospital.11018'],
+      isTrusted: true,
+      createdAt: '2026-02-15T00:00:00.000Z',
+      createdByName: 'ศุภชัย สุนารักษ์',
+    },
+  ];
 }
 
 function loadClients(): Map<string, OAuthClientApp> {
   const map = new Map<string, OAuthClientApp>();
 
-  // 1. โหลดจากไฟล์ฐานข้อมูลถาวรของระบบ (Bundled in repo)
+  // 1. โหลด Production Clients เริ่มต้นที่ Build-in ในโค้ดเสมอ (รับประกันว่าไม่สูญหายบน Serverless)
+  for (const client of getDefaultClients()) {
+    map.set(client.clientId, client);
+  }
+
+  // 2. โหลดจากไฟล์ฐานข้อมูลถาวรของระบบ (ถ้ามี)
   try {
     if (fs.existsSync(BASE_CLIENTS_FILE)) {
       const content = fs.readFileSync(BASE_CLIENTS_FILE, 'utf-8');
@@ -43,7 +92,7 @@ function loadClients(): Map<string, OAuthClientApp> {
     console.warn('[OAuthIdpService] Error reading base oauth-clients.json:', err);
   }
 
-  // 2. ถ้ามีไฟล์ Runtime ให้ merge เพิ่มเติมหรืออัปเดต
+  // 3. ถ้ามีไฟล์ Runtime ให้ merge เพิ่มเติมหรืออัปเดต
   try {
     if (RUNTIME_CLIENTS_FILE !== BASE_CLIENTS_FILE && fs.existsSync(RUNTIME_CLIENTS_FILE)) {
       const content = fs.readFileSync(RUNTIME_CLIENTS_FILE, 'utf-8');
