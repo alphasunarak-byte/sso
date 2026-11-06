@@ -799,7 +799,12 @@ export default function ConsolePage() {
                           key={app.id || app.clientId}
                           onClick={() => {
                             if (app.redirectUris && app.redirectUris[0]) {
-                              window.open(app.redirectUris[0], '_blank');
+                              let targetUrl = app.redirectUris[0];
+                              try {
+                                const u = new URL(targetUrl);
+                                targetUrl = u.origin;
+                              } catch {}
+                              window.open(targetUrl, '_blank');
                             }
                           }}
                           className="group relative bg-white dark:bg-zinc-900/90 hover:bg-gradient-to-b hover:from-white hover:to-emerald-50/40 dark:hover:to-emerald-950/30 rounded-2xl p-5 border border-zinc-200/80 dark:border-zinc-800 hover:border-emerald-500/80 dark:hover:border-emerald-500/80 shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-200 flex flex-col justify-between cursor-pointer"

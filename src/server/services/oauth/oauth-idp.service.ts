@@ -17,50 +17,57 @@ const globalClients: Map<string, OAuthClientApp> = new Map();
 const globalAuthCodes: Map<string, AuthCodeEntry> = new Map();
 
 // รองรับทั้ง Vercel Serverless (/tmp) และ Local Development (process.cwd()/data)
-const DATA_DIR = process.env.VERCEL ? path.join('/tmp', 'nhh-data') : path.join(process.cwd(), 'data');
-const CLIENTS_FILE = path.join(DATA_DIR, 'oauth-clients.json');
+const BASE_CLIENTS_FILE = path.join(process.cwd(), 'data', 'oauth-clients.json');
+const RUNTIME_DIR = process.env.VERCEL ? path.join('/tmp', 'nhh-data') : path.join(process.cwd(), 'data');
+const RUNTIME_CLIENTS_FILE = path.join(RUNTIME_DIR, 'oauth-clients.json');
 
 function getDefaultClients(): OAuthClientApp[] {
-  // ไม่มี mock หรือระบบจำลอง เริ่มต้นจากรายการว่าง ถ้าต้องการใช้งานระบบใด ให้ลงทะเบียนผ่านหน้าเว็บเท่านั้น
   return [];
 }
 
 function loadClients(): Map<string, OAuthClientApp> {
   const map = new Map<string, OAuthClientApp>();
+
+  // 1. โหลดจากไฟล์ฐานข้อมูลถาวรของระบบ (Bundled in repo)
   try {
-    if (fs.existsSync(CLIENTS_FILE)) {
-      const content = fs.readFileSync(CLIENTS_FILE, 'utf-8');
+    if (fs.existsSync(BASE_CLIENTS_FILE)) {
+      const content = fs.readFileSync(BASE_CLIENTS_FILE, 'utf-8');
       const parsed = JSON.parse(content);
       if (Array.isArray(parsed)) {
         for (const client of parsed) {
           map.set(client.clientId, client);
         }
-        return map;
       }
     }
   } catch (err) {
-    console.warn('[OAuthIdpService] Error reading oauth-clients.json:', err);
+    console.warn('[OAuthIdpService] Error reading base oauth-clients.json:', err);
   }
 
-  // หากยังไม่มีไฟล์ ให้สร้างไฟล์เปล่า ไม่มีระบบจำลอง
+  // 2. ถ้ามีไฟล์ Runtime ให้ merge เพิ่มเติมหรืออัปเดต
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (RUNTIME_CLIENTS_FILE !== BASE_CLIENTS_FILE && fs.existsSync(RUNTIME_CLIENTS_FILE)) {
+      const content = fs.readFileSync(RUNTIME_CLIENTS_FILE, 'utf-8');
+      const parsed = JSON.parse(content);
+      if (Array.isArray(parsed)) {
+        for (const client of parsed) {
+          map.set(client.clientId, client);
+        }
+      }
     }
-    fs.writeFileSync(CLIENTS_FILE, JSON.stringify([], null, 2), 'utf-8');
   } catch (err) {
-    console.error('Failed to initialize oauth-clients.json:', err);
+    console.warn('[OAuthIdpService] Error reading runtime oauth-clients.json:', err);
   }
+
   return map;
 }
 
 function saveClients(map: Map<string, OAuthClientApp>): void {
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    if (!fs.existsSync(RUNTIME_DIR)) {
+      fs.mkdirSync(RUNTIME_DIR, { recursive: true });
     }
     const list = Array.from(map.values());
-    fs.writeFileSync(CLIENTS_FILE, JSON.stringify(list, null, 2), 'utf-8');
+    fs.writeFileSync(RUNTIME_CLIENTS_FILE, JSON.stringify(list, null, 2), 'utf-8');
   } catch (err) {
     console.error('Failed to save oauth-clients.json:', err);
   }

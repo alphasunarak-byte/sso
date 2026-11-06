@@ -35,8 +35,8 @@ yarn-error.log*
 !.env.example
 
 # production data & secrets
-/data/
 /data/*
+!/data/oauth-clients.json
 *.pem
 *.key
 
